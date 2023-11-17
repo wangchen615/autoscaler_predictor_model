@@ -46,23 +46,25 @@ def fit_model():
     # Prepare model inputs
     X = df[['minutes_since_midnight']]
 
-    # Define 4-degree polynomial regression model
-    polynomial_regression = make_pipeline(PolynomialFeatures(4), LinearRegression())
-
     # Check for columns and fit models accordingly
     if 'cpu' in df.columns and 'memory' in df.columns:
+        # Define 4-degree polynomial regression model
+        cpu_polynomial_regression = make_pipeline(PolynomialFeatures(4), LinearRegression())
+        memory_polynomial_regression = make_pipeline(PolynomialFeatures(4), LinearRegression())
 
         # Fit model for CPU
-        cpu_model = polynomial_regression
+        cpu_model = cpu_polynomial_regression
         cpu_model.fit(X, df['cpu'])
         response['cpu_model'] = 'Model fitted for CPU'
 
         # Fit model for memory
-        memory_model = polynomial_regression
+        memory_model = memory_polynomial_regression
         memory_model.fit(X, df['memory'])
         response['memory_model'] = 'Model fitted for memory'
 
     elif 'requests' in df.columns:
+        polynomial_regression = make_pipeline(PolynomialFeatures(4), LinearRegression())
+
         # Fit a single model for requests
         requests_model = polynomial_regression
         requests_model.fit(X, df['requests'])
