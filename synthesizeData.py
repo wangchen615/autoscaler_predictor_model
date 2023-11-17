@@ -1,10 +1,13 @@
 # This is a sample Python script.
 
+
 # Press ⇧F10 to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+
+from datetime import datetime
 
 SAMPLING_INTERVAL = 15  # in minutes
 MAX_CPU = 200 # in vCPU cores
@@ -29,7 +32,7 @@ def utilization_pattern(time, peak_time, min_val, max_val, variation):
     value = min_val + (max_val - min_val) * (value + 1) / 2
     # Add random variation
     value += np.random.uniform(-variation, variation)
-    return max(min_val, min(max_val, value))
+    return int(max(min_val, min(max_val, value)))
 
 #  python script that generates a periodic CPU/Memory utilization values for 4 weeks.
 #  The data is sampled every 15 minutes starting from 0:00 am.
@@ -52,6 +55,7 @@ def synthesize_data(num_weeks, type='resource'):
         mem_usage = []
     else:
         requests_ts = []
+
     for time in timestamps:
         if type == 'resource':
             cpu = utilization_pattern(time, PEAK_HOUR * 60, MIN_CPU, MAX_CPU, CPU_VAR)  # Peak at 10:00 AM
@@ -64,11 +68,11 @@ def synthesize_data(num_weeks, type='resource'):
 
     # Create DataFrame
     if type == 'resource':
-        ts_df = pd.DataFrame({'Timestamp': timestamps, 'CPU': cpu_usage, 'Memory': mem_usage})
+        ts_df = pd.DataFrame({'timestamp': timestamps, 'cpu': cpu_usage, 'memory': mem_usage})
     else:
-        ts_df = pd.DataFrame({'Timestamp': timestamps, 'Requests': requests_ts})
+        ts_df = pd.DataFrame({'timestamp': timestamps, 'requests': requests_ts})
 
-    ts_df.set_index('Timestamp', inplace=True)
+    ts_df.set_index('timestamp', inplace=True)
     return ts_df
 
 def plot_synthesized_data(df, type='resource'):
@@ -76,18 +80,26 @@ def plot_synthesized_data(df, type='resource'):
     plt.figure(figsize=(15, 5))
 
     if type == 'resource':
-        plt.plot(df.index, df.CPU, label='CPU Usage (vCPU cores)')
-        plt.plot(df.index, df.Memory, label='Memory Usage (GB)')
+        plt.plot(df.index, df.cpu, label='CPU Usage (vCPU cores)')
+        plt.plot(df.index, df.memory, label='Memory Usage (GB)')
         plt.xlabel('Time')
         plt.ylabel('Utilization')
         plt.title('Sample Resource Utilization')
     else:
-        plt.plot(df.index, df.Requests, label='Requests (per second)')
+        plt.plot(df.index, df.requests, label='Requests (per second)')
         plt.xlabel('Time')
         plt.ylabel('Requests')
         plt.title('Sample Requests')
     plt.legend()
     plt.show()
+
+    # Save plot & data
+    current_time_string = datetime.now().strftime("%y-%m-%d-%H-%M")
+
+    plt.savefig('./imgs/{}-{}.png'.format(type, current_time_string))
+    plt.savefig('./imgs/{}-{}.pdf'.format(type, current_time_string))
+
+    df.to_csv('./data/{}-{}.csv'.format(type, current_time_string))
 
 
 # Press the green button in the gutter to run the script.
