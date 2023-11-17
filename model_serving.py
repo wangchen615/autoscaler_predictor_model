@@ -1,10 +1,11 @@
 from flask import Flask, request, jsonify
 import pandas as pd
-import numpy as np
 from io import StringIO
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import make_pipeline
+from datetime import timedelta
+from statsmodels.tsa.statespace.sarimax import SARIMAX
 
 app = Flask(__name__)
 
@@ -19,11 +20,18 @@ def fit_model():
 
     # Read CSV file from the request
     file = request.files['file']
-    if not file:
-        return jsonify({'error': 'No file provided'}), 400
 
-    # Convert file to DataFrame
-    df = pd.read_csv(StringIO(file.read().decode('utf-8')))
+    # Determine file type from filename extension
+    file_type = file.filename.split('.')[-1].lower()
+
+    # Convert file to DataFrame based on file type
+    if file_type == 'csv':
+        df = pd.read_csv(StringIO(file.read().decode('utf-8')))
+    elif file_type == 'json':
+        df = pd.read_json(StringIO(file.read().decode('utf-8')))
+        df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+    else:
+        return jsonify({'error': 'Unsupported file type'}), 400
 
     # Validate DataFrame format
     if 'timestamp' not in df.columns:
@@ -38,22 +46,25 @@ def fit_model():
     # Prepare model inputs
     X = df[['minutes_since_midnight']]
 
+    # Define 4-degree polynomial regression model
+    polynomial_regression = make_pipeline(PolynomialFeatures(4), LinearRegression())
+
     # Check for columns and fit models accordingly
     if 'cpu' in df.columns and 'memory' in df.columns:
 
         # Fit model for CPU
-        cpu_model = LinearRegression()
+        cpu_model = polynomial_regression
         cpu_model.fit(X, df['cpu'])
         response['cpu_model'] = 'Model fitted for CPU'
 
         # Fit model for memory
-        memory_model = LinearRegression()
+        memory_model = polynomial_regression
         memory_model.fit(X, df['memory'])
         response['memory_model'] = 'Model fitted for memory'
 
     elif 'requests' in df.columns:
         # Fit a single model for requests
-        requests_model = LinearRegression()
+        requests_model = polynomial_regression
         requests_model.fit(X, df['requests'])
         response['requests_model'] = 'Model fitted for requests'
 
@@ -103,6 +114,53 @@ def predict():
     else:
         return jsonify({'error': 'Invalid prediction type'}), 400
 
+@app.route('/forecast', methods=['POST'])
+def forecast():
+    # Check if the request contains JSON data
+    if request.is_json:
+        data = request.get_json()
+        df = pd.DataFrame(data)
+        df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+    else:
+        # Read CSV file from the request
+        file = request.files.get('file')
+        if not file:
+            return jsonify({'error': 'No file provided'}), 400
+        # Convert file to DataFrame
+        df = pd.read_csv(StringIO(file.read().decode('utf-8')))
+
+    # Validate DataFrame format and presence of timestamp
+    if 'timestamp' not in df.columns:
+        return jsonify({'error': 'CSV/JSON must contain timestamp column'}), 400
+
+    # Convert timestamps to DateTime and sort
+    df['timestamp'] = pd.to_datetime(df['timestamp'])
+    df.set_index('timestamp', inplace=True)
+    df.sort_index(inplace=True)
+
+    # Predict for the next 15 minutes
+    last_timestamp = df.index[-1]
+    next_timestamp = last_timestamp + timedelta(minutes=15)
+
+    prediction = {}
+
+    # SARIMA models for each type of data
+    if 'cpu' in df.columns and 'memory' in df.columns:
+        cpu_model = SARIMAX(df['cpu'], order=(1, 1, 1), seasonal_order=(1, 1, 1, 4))
+        cpu_results = cpu_model.fit()
+        prediction['cpu'] = cpu_results.forecast(steps=1)[0]
+
+        memory_model = SARIMAX(df['memory'], order=(1, 1, 1), seasonal_order=(1, 1, 1, 4))
+        memory_results = memory_model.fit()
+        prediction['memory'] = memory_results.forecast(steps=1)[0]
+
+    if 'requests' in df.columns:
+        requests_model = SARIMAX(df['requests'], order=(1, 1, 1), seasonal_order=(1, 1, 1, 4))
+        requests_results = requests_model.fit()
+        prediction['requests'] = requests_results.forecast(steps=1)[0]
+
+    prediction['timestamp'] = next_timestamp.strftime('%Y-%m-%d %H:%M:%S')
+    return jsonify(prediction)
 
 if __name__ == '__main__':
     app.run(debug=True)

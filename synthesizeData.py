@@ -1,27 +1,27 @@
-# This is a sample Python script.
-
-
-# Press ⇧F10 to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+# This script generates a periodic CPU/Memory utilization or requests/s values for 4 weeks.
+import configparser
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-
 from datetime import datetime
 
-SAMPLING_INTERVAL = 15  # in minutes
-MAX_CPU = 200 # in vCPU cores
-MIN_CPU = 50 # in vCPU cores
-CPU_VAR = 40
-MAX_MEM = 200 # in GB
-MIN_MEM = 20 # in GB
-MEM_VAR = 10
-MAX_REQUESTS = 1000  # in requests per second
-MIN_REQUESTS = 50    # in requests per second
-REQUESTS_VAR = 10
+# Load configuration
+config = configparser.ConfigParser()
+config.read('config.ini')
 
-PEAK_HOUR = 10  # 10:00 AM
-
+# Constants from config file
+SAMPLING_INTERVAL = config.getint('DEFAULT', 'SamplingInterval')
+MAX_CPU = config.getint('DEFAULT', 'MaxCpu')
+MIN_CPU = config.getint('DEFAULT', 'MinCpu')
+CPU_VAR = config.getint('DEFAULT', 'CpuVar')
+MAX_MEM = config.getint('DEFAULT', 'MaxMem')
+MIN_MEM = config.getint('DEFAULT', 'MinMem')
+MEM_VAR = config.getint('DEFAULT', 'MemVar')
+MAX_REQUESTS = config.getint('DEFAULT', 'MaxRequests')
+MIN_REQUESTS = config.getint('DEFAULT', 'MinRequests')
+REQUESTS_VAR = config.getint('DEFAULT', 'RequestsVar')
+PEAK_HOUR = config.getint('DEFAULT', 'PeakHour')
+NUM_WEEKS = config.getint('DEFAULT', 'NumWeeks')
 
 def utilization_pattern(time, peak_time, min_val, max_val, variation):
     # Convert time to minutes since midnight
@@ -100,16 +100,18 @@ def plot_synthesized_data(df, type='resource'):
     plt.savefig('./imgs/{}-{}.pdf'.format(type, current_time_string))
 
     df.to_csv('./data/{}-{}.csv'.format(type, current_time_string))
+    # Reset the index, moving it back to a column
+    df.reset_index(inplace=True)
+    df.to_json('./data/{}-{}.json'.format(type, current_time_string), orient='records')
 
     plt.show()
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    rsc_df = synthesize_data(4, 'resource')
+    rsc_df = synthesize_data(NUM_WEEKS, 'resource')
     plot_synthesized_data(rsc_df, 'resource')
 
-    req_df = synthesize_data(1, 'requests')
+    req_df = synthesize_data(NUM_WEEKS, 'requests')
     plot_synthesized_data(req_df, 'requests')
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
