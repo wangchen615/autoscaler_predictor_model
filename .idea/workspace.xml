@@ -5,17 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b9085c9b-15ef-4f2a-884b-08c0aea5ad6b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/config.ini" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/requests-23-11-16-19-57.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/resource-23-11-16-19-57.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/imgs/requests-23-11-16-19-57.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/imgs/requests-23-11-16-19-57.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/imgs/resource-23-11-16-19-57.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/imgs/resource-23-11-16-19-57.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_serving.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_serving.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/synthesizeData.py" beforeDir="false" afterPath="$PROJECT_DIR$/synthesizeData.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_serving.py" beforeDir="false" afterPath="$PROJECT_DIR$/model_server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,8 +55,8 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="Python.model_serving">
-    <configuration name="model_serving" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.model_server">
+    <configuration name="model_server" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="autoscaler-predictor" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -75,7 +69,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/model_serving.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/model_server.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -108,7 +102,7 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.model_serving" />
+        <item itemvalue="Python.model_server" />
       </list>
     </recent_temporary>
   </component>
@@ -121,7 +115,7 @@
       <option name="presentableId" value="Default" />
       <updated>1700071539204</updated>
       <workItem from="1700071545194" duration="4094000" />
-      <workItem from="1700170583674" duration="12280000" />
+      <workItem from="1700170583674" duration="15079000" />
     </task>
     <servers />
   </component>

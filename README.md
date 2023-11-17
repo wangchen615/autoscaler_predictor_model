@@ -27,8 +27,8 @@ The json file name is in the format: `<type>-<year>-<month>-<day>-<hour>-<minute
 ## How to use the model server
 ### Build and Run the Docker image
 ```bash
-podman build -t model-server .
-podman run -p 5000:5000 model-server
+podman build -t autoscaler-prediction-model-server .
+podman run -p 5000:5000 autoscaler-prediction-model-server
 ```
 
 ### Usage Instructions:

@@ -1,6 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.8-slim
-LABEL authors="chenw615"
+FROM python:3.9-slim
 
 # Set the working directory in the container
 WORKDIR /usr/src/app
@@ -21,4 +20,4 @@ EXPOSE 5000
 ENV NAME AUTOSCALER_MODEL_SERVER
 
 # Run model_server.py when the container launches
-CMD ["python", "./model_server.py"]
+CMD ["python", "model_server.py"]
