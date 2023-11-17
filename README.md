@@ -28,7 +28,7 @@ The json file name is in the format: `<type>-<year>-<month>-<day>-<hour>-<minute
 ### Build and Run the Docker image
 ```bash
 podman build -t autoscaler-prediction-model-server .
-podman run -p 5000:5000 autoscaler-prediction-model-server
+podman run -p 5001:5001 autoscaler-prediction-model-server
 ```
 
 ### Usage Instructions:
@@ -38,7 +38,7 @@ podman run -p 5000:5000 autoscaler-prediction-model-server
 
 An example `curl` command to fit the model:
 ```bash
-curl -X POST http://localhost:5000/fit-model -F 'file=@/path/to/data.csv'
+curl -X POST http://localhost:5001/fit-model -F 'file=@/path/to/data.csv'
 ```
 
 2. Get Predictions:
@@ -48,8 +48,8 @@ curl -X POST http://localhost:5000/fit-model -F 'file=@/path/to/data.csv'
 
 An example `curl` command to get predictions:
 ```bash
-curl -X GET "http://localhost:5000/predict?type=resource&timestamp=2023-03-15T14:30:00"
-curl -X GET "http://localhost:5000/predict?type=requests&timestamp=2023-03-15T14:30:00"
+curl -X GET "http://localhost:5001/predict?type=resource&timestamp=2023-03-15T14:30:00"
+curl -X GET "http://localhost:5001/predict?type=requests&timestamp=2023-03-15T14:30:00"
 ```
 
 3. Get Forecasts:
@@ -58,20 +58,20 @@ curl -X GET "http://localhost:5000/predict?type=requests&timestamp=2023-03-15T14
 - The server returns the predicted cpu/memory or requests value(s) based on SARIMA algorithm running on the given data.
 Example `curl` command to get forecasts from a csv file:
 ```bash
- curl -X POST http://127.0.0.1:5000/forecast \
+ curl -X POST http://127.0.0.1:5001/forecast \
 -H "Content-Type: multipart/form-data" \
 -F "file=@./data/requests-23-11-16-22-51.csv"
 ```
 
 Example `curl` command to get forecasts from a json object:
 ```bash
-curl -X POST http://127.0.0.1:5000/forecast \
+curl -X POST http://127.0.0.1:5001/forecast \
 -H "Content-Type: application/json" \
 -d '[{"timestamp":1700092800000,"requests":279},{"timestamp":1700093700000,"requests":257},{"timestamp":1700094600000,"requests":230}]'
 ```
 
 
 #### Notes:
-- The fit-model endpoint expects a CSV file with two columns: timestamp and requests or three columes: timestamp, cpu and memory.
+- The fit-model endpoint expects a CSV file with two columns: timestamp and requests or three columes: timestamp, cpu and memory. Sample data can be found in the `data` folder.
 - The predict endpoint requires a timestamp in a recognizable datetime format.
 - The model fitting is simplistic and assumes a polynomial model. You may need to adjust the model fitting part based on your specific requirements.
