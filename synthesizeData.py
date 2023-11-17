@@ -91,7 +91,7 @@ def plot_synthesized_data(df, type='resource'):
         plt.ylabel('Requests')
         plt.title('Sample Requests')
     plt.legend()
-    plt.show()
+
 
     # Save plot & data
     current_time_string = datetime.now().strftime("%y-%m-%d-%H-%M")
@@ -100,6 +100,8 @@ def plot_synthesized_data(df, type='resource'):
     plt.savefig('./imgs/{}-{}.pdf'.format(type, current_time_string))
 
     df.to_csv('./data/{}-{}.csv'.format(type, current_time_string))
+
+    plt.show()
 
 
 # Press the green button in the gutter to run the script.
